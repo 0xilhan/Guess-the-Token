@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Token Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        :root {
+            --bg: #0E0E10;
+            --card: #121216;
+            --accent1: #A855F7;
+            --accent2: #22D3EE;
+            --muted: #BFC7D1;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.03);
+            --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--muted);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at top, rgba(168, 85, 247, 0.1), transparent),
+                        radial-gradient(ellipse at bottom, rgba(34, 211, 238, 0.05), transparent),
+                        var(--bg);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent1), var(--accent2));
+            opacity: 0.1;
+            filter: blur(20px);
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 90vh;
+            max-height: 800px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 1s ease, opacity 1s ease;
+        }
+        
+        .app-container.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .neon-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 5;
+        }
+        
+        .neon-success {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.7), 0 0 30px rgba(16, 185, 129, 0.5), 0 0 45px rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+        
+        .neon-wrong {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.7), 0 0 30px rgba(239, 68, 68, 0.5), 0 0 45px rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        .neon-win {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.7), 0 0 30px rgba(168, 85, 247, 0.5), 0 0 45px rgba(168, 85, 247, 0.3), 
+                        0 0 15px rgba(34, 211, 238, 0.7), 0 0 30px rgba(34, 211, 238, 0.5), 0 0 45px rgba(34, 211, 238, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-header .logo {
+            transform: scale(0);
+            animation: logo-pop 0.8s ease 1s forwards;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            animation: shine 3s infinite 1s;
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .app-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fade-up 0.8s ease 1.2s forwards;
+        }
+        
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(14, 14, 16, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 1s ease 3s; /* Fade out after animation */
+        }
+        
+        .intro-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #intro-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: transparent;
+            border: 2px solid rgba(168, 85, 247, 0.5);
+            box-shadow: none;
+            opacity: 0;
+            animation: boot-sequence 3.5s ease-in-out forwards;
+        }
+        #intro-logo .logo-icon {
+            font-size: 40px;
+            opacity: 0;
+            animation: fade-in-icon 1s ease 1.5s forwards;
+        }
+        
+        .welcome-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(168, 85, 247, 0.3);
+        }
+        
+        .welcome-subtitle {
+            font-size: 16px;
+            margin-bottom: 30px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(168, 85, 247, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .question-counter {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .score-display {
+            font-weight: 600;
+            font-size: 16px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            color: white;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        .option.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10B981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            animation: pulse-correct 0.5s ease;
+        }
+        
+        .option.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            animation: shake 0.5s ease;
+        }
+        
+        .option.disabled {
+            pointer-events: none;
+        }
+        
+        .option-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .result-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .result-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .result-score {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .result-message {
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .app-footer {
+            text-align: center;
+            padding: 15px 0 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--accent1);
+            opacity: 0;
+        }
+        
+        .celebration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+            display: none;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent1);
+            opacity: 0;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pulse-glow {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        @keyframes pulse-correct {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+            50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes logo-pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fade-up {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fade-in-icon {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+
+        @keyframes boot-sequence {
+            0% { opacity: 1; transform: scale(0.8); border-color: rgba(168, 85, 247, 0.2); box-shadow: none; background: transparent; }
+            25% { border-color: rgba(168, 85, 247, 0.8); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+            60% { background: linear-gradient(135deg, var(--accent1), var(--accent2)); box-shadow: 0 8px 30px rgba(168, 85, 247, 0.5); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-height: 700px) {
+            .app-container {
+                height: 95vh;
+                padding: 15px;
+            }
+            
+            .welcome-title {
+                font-size: 28px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="floating-shapes" id="floating-shapes"></div>
+    </div>
+    
+    <div class="app-container" id="app-container">
+        <div class="neon-border" id="neon-border"></div>
+        
+        <div class="intro-screen" id="intro-screen">
+            <div class="logo" id="intro-logo">
+                 <div class="logo-icon">₿</div>
+            </div>
+        </div>
+        
+        <div class="app-header">
+            <div class="logo">
+                <div class="logo-icon">₿</div>
+            </div>
+            <div class="app-title">Crypto Token Quiz</div>
+        </div>
+        
+        <div class="app-main">
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="screen hidden">
+                <h1 class="welcome-title floating">CRYPTO QUIZ</h1>
+                <p class="welcome-subtitle">Test your knowledge of cryptocurrency tokens and blockchain technology</p>
+                <button id="start-btn" class="btn btn-primary pulse">Start Quiz</button>
+            </div>
+            
+            <!-- Quiz Screen -->
+            <div id="quiz-screen" class="screen hidden">
+                <div class="question-container">
+                    <div class="quiz-header">
+                        <div class="question-counter">Question <span id="current-question">1</span>/<span id="total-questions">5</span></div>
+                        <div class="score-display">Score: <span id="current-score">0</span></div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div id="progress" class="progress"></div>
+                    </div>
+                    
+                    <h2 id="question-text" class="question-text">Which project pioneered zk-SNARKs?</h2>
+                    
+                    <div id="options-container" class="options-container">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Screen -->
+            <div id="results-screen" class="screen hidden">
+                <div class="result-container">
+                    <div id="result-icon" class="result-icon">🎉</div>
+                    <h2 id="result-title" class="result-title">Quiz Complete!</h2>
+                    <div id="result-score" class="result-score">You scored 0/5</div>
+                    <p id="result-message" class="result-message">Nice effort! Keep learning to improve your crypto knowledge.</p>
+                    
+                    <div class="action-buttons">
+                        <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+                        <button id="share-btn" class="btn btn-secondary">Share Score</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="app-footer">
+            Test your crypto knowledge • No personal data collected
+        </div>
+        
+        <div id="confetti-container" class="confetti-container"></div>
+        <div id="celebration" class="celebration"></div>
+    </div>
+    
+    <div id="toast" class="toast">Copied to clipboard</div>
+    
+    <script>
+        // Question bank
+        const questions = [
+            {
+                question: "Which project pioneered zk-SNARKs?",
+                options: ["Polygon", "Solana", "Zcash", "Chainlink"],
+                correctAnswer: 2
+            },
+            {
+                question: "Which chain is known for low transaction fees and EVM-compatibility?",
+                options: ["Bitcoin", "Polkadot", "Polygon", "Cardano"],
+                correctAnswer: 2
+            },
+            {
+                question: "Which project introduced the concept of smart contracts on a major chain?",
+                options: ["Ethereum", "Litecoin", "Dogecoin", "Avalanche"],
+                correctAnswer: 0
+            },
+            {
+                question: "Which token is the native asset of the Solana blockchain?",
+                options: ["SOL", "ADA", "DOT", "XRP"],
+                correctAnswer: 0
+            },
+            {
+                question: "Which protocol is primarily associated with oracle data feeds?",
+                options: ["Uniswap", "Chainlink", "SushiSwap", "Curve"],
+                correctAnswer: 1
+            },
+            {
+                question: "Which project is a Layer 1 with a strong focus on zero-knowledge tech?",
+                options: ["StarkNet", "Filecoin", "Tezos", "NEAR"],
+                correctAnswer: 0
+            },
+            {
+                question: "What does NFT stand for?",
+                options: ["Non-Fungible Token", "New Financial Token", "Node-Final Token", "Native Function Token"],
+                correctAnswer: 0
+            },
+            {
+                question: "What is a common abbreviation for Total Value Locked?",
+                options: ["TVL", "TVD", "TWP", "TMC"],
+                correctAnswer: 0
+            },
+            {
+                question: "Which protocol is a major AMM DEX on Ethereum?",
+                options: ["Uniswap", "Aave", "Maker", "PancakeSwap"],
+                correctAnswer: 0
+            },
+            {
+                question: "Which chain uses Proof-of-Stake (PoS) consensus after The Merge?",
+                options: ["Ethereum", "Bitcoin", "Monero", "Dogecoin"],
+                correctAnswer: 0
+            }
+        ];
+
+        // DOM Elements
+        const appContainer = document.getElementById('app-container');
+        const introScreen = document.getElementById('intro-screen');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const startBtn = document.getElementById('start-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const currentQuestionEl = document.getElementById('current-question');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const currentScoreEl = document.getElementById('current-score');
+        const progressEl = document.getElementById('progress');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const resultIconEl = document.getElementById('result-icon');
+        const resultTitleEl = document.getElementById('result-title');
+        const resultScoreEl = document.getElementById('result-score');
+        const resultMessageEl = document.getElementById('result-message');
+        const confettiContainer = document.getElementById('confetti-container');
+        const celebrationContainer = document.getElementById('celebration');
+        const toast = document.getElementById('toast');
+        const neonBorder = document.getElementById('neon-border');
+        const floatingShapes = document.getElementById('floating-shapes');
+
+        // Game state
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedQuestions = [];
+        const questionsPerGame = 5;
+        let soundsReady = false;
+        let sfx = {};
+
+        // Initialize the app
+        function init() {
+            createFloatingShapes();
+            
+            setTimeout(() => {
+                appContainer.classList.add('active');
+            }, 500);
+
+            // Auto-skip intro
+            setTimeout(() => {
+                skipIntro();
+            }, 3500);
+            
+            startBtn.addEventListener('click', startGame);
+            playAgainBtn.addEventListener('click', startGame);
+            shareBtn.addEventListener('click', shareResults);
+
+            initSounds(); // Initialize sounds early
+            setTimeout(() => playSound('boot_start'), 200);
+            setTimeout(() => playSound('boot_charge'), 1000);
+            setTimeout(() => playSound('boot_complete'), 2500);
+        }
+        
+        function initSounds() {
+            if (soundsReady) return;
+             if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+            sfx = {
+                boot_start: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.2, release: 1 } }).toDestination(),
+                boot_charge: new Tone.AMSynth({ harmonicity: 1.5, detune: 0, oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }, modulation : { type: "square" }, modulationEnvelope: { attack: 0.5, decay: 0.01 } }).toDestination(),
+                boot_complete: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination(),
+                click: new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 2, envelope: { attack: 0.001, decay: 0.2, sustain: 0.01, release: 0.1 } }).toDestination(),
+                correct: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination(),
+                wrong: new Tone.MonoSynth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.3, sustain: 0, release: 0.3 } }).toDestination(),
+                win: new Tone.PolySynth(Tone.Synth, { envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 } }).toDestination(),
+                celebration: new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.5, modulationIndex: 10, detune: 0, oscillator: { type: 'sine'}, envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 } }).toDestination()
+            };
+            soundsReady = true;
+        }
+
+        function playSound(sound) {
+            if (!soundsReady) return;
+            const s = sfx[sound];
+            if(!s) return;
+
+            if (sound === 'boot_start') sfx.boot_start.triggerAttackRelease('C2', '2n');
+            if (sound === 'boot_charge') sfx.boot_charge.triggerAttackRelease('C3', '0.5n');
+            if (sound === 'boot_complete') sfx.boot_complete.triggerAttackRelease('C5', '8n');
+            if (sound === 'click') sfx.click.triggerAttackRelease('C2', '8n', Tone.now());
+            if (sound === 'correct') sfx.correct.triggerAttackRelease('C5', '8n');
+            if (sound === 'wrong') sfx.wrong.triggerAttackRelease('A2', '8n');
+            if (sound === 'win') sfx.win.triggerAttackRelease(['C4', 'G4', 'C5'], '4n');
+            if (sound === 'celebration') sfx.celebration.triggerAttackRelease(['C5', 'E5', 'G5', 'C6'], '4n');
+        }
+
+        // Create floating background shapes
+        function createFloatingShapes() {
+            for (let i = 0; i < 15; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+                
+                const size = Math.random() * 100 + 50;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const animationDuration = Math.random() * 20 + 10;
+                const animationDelay = Math.random() * 5;
+                
+                shape.style.width = `${size}px`;
+                shape.style.height = `${size}px`;
+                shape.style.left = `${left}%`;
+                shape.style.top = `${top}%`;
+                shape.style.animation = `floating ${animationDuration}s ease-in-out ${animationDelay}s infinite`;
+                
+                floatingShapes.appendChild(shape);
+            }
+        }
+
+        // Skip intro and go to welcome screen
+        function skipIntro() {
+            introScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        }
+
+        // Start a new game
+        function startGame() {
+            playSound('click');
+            currentQuestionIndex = 0;
+            score = 0;
+            currentScoreEl.textContent = score;
+            
+            neonBorder.classList.remove('neon-success', 'neon-wrong', 'neon-win');
+            neonBorder.style.opacity = '0';
+            
+            celebrationContainer.style.display = 'none';
+            
+            selectedQuestions = [...questions]
+                .sort(() => 0.5 - Math.random())
+                .slice(0, questionsPerGame);
+            
+            totalQuestionsEl.textContent = selectedQuestions.length;
+            
+            showScreen(quizScreen);
+            showQuestion();
+        }
+
+        // Show a specific screen
+        function showScreen(screen) {
+            welcomeScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            
+            screen.classList.remove('hidden');
+            screen.classList.add('fade-in');
+            
+            setTimeout(() => {
+                screen.classList.remove('fade-in');
+            }, 500);
+        }
+
+        // Display the current question
+        function showQuestion() {
+            const question = selectedQuestions[currentQuestionIndex];
+            currentQuestionEl.textContent = currentQuestionIndex + 1;
+            questionTextEl.textContent = question.question;
+            
+            progressEl.style.width = `${((currentQuestionIndex) / selectedQuestions.length) * 100}%`;
+            
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('button');
+                optionElement.className = 'option';
+                optionElement.innerHTML = `
+                    <div class="option-indicator">${String.fromCharCode(65 + index)}</div>
+                    <span>${option}</span>
+                `;
+                
+                optionElement.addEventListener('click', () => selectAnswer(index));
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(selectedIndex) {
+            playSound('click');
+            const question = selectedQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.add('disabled');
+            });
+            
+            if (selectedIndex === question.correctAnswer) {
+                options[selectedIndex].classList.add('correct');
+                score++;
+                currentScoreEl.textContent = score;
+                playSound('correct');
+                
+                neonBorder.classList.add('neon-success');
+                neonBorder.style.opacity = '1';
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                options[question.correctAnswer].classList.add('correct');
+                playSound('wrong');
+                
+                neonBorder.classList.add('neon-wrong');
+                neonBorder.style.opacity = '1';
+            }
+            
+            setTimeout(() => {
+                neonBorder.style.opacity = '0';
+                
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex < selectedQuestions.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        // Show the results screen
+        function showResults() {
+            playSound('win');
+            progressEl.style.width = '100%';
+            
+            resultScoreEl.textContent = `You scored ${score}/${selectedQuestions.length}`;
+            
+            let message, icon, title;
+            const percentage = (score / selectedQuestions.length) * 100;
+            
+            if (percentage >= 80) {
+                title = "Crypto Expert!";
+                message = "Impressive! You clearly know your way around the blockchain.";
+                icon = "🚀";
+            } else if (percentage >= 60) {
+                title = "Solid Knowledge!";
+                message = "Good job! You have a solid understanding of crypto concepts.";
+                icon = "👍";
+            } else if (percentage >= 40) {
+                title = "Getting There!";
+                message = "Not bad! With a bit more study, you'll be a crypto pro in no time.";
+                icon = "💡";
+            } else {
+                title = "Keep Learning!";
+                message = "Crypto is complex. Keep exploring and you'll improve!";
+                icon = "📚";
+            }
+            
+            resultIconEl.textContent = icon;
+            resultTitleEl.textContent = title;
+            resultMessageEl.textContent = message;
+            
+            if (percentage >= 60) {
+                createConfetti();
+                createFireworks();
+                
+                neonBorder.classList.add('neon-win');
+                neonBorder.style.opacity = '1';
+                
+                playSound('celebration');
+            }
+            
+            showScreen(resultsScreen);
+        }
+
+        // Share results
+        function shareResults() {
+            playSound('click');
+            const shareText = `I scored ${score}/${selectedQuestions.length} on the Crypto Token Quiz! How well do you know crypto?`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Crypto Token Quiz',
+                    text: shareText
+                }).catch(err => {
+                    console.log('Error sharing:', err);
+                    copyToClipboard(shareText);
+                });
+            } else {
+                copyToClipboard(shareText);
+            }
+        }
+
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+             try {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                // Make the textarea invisible
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Results copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                showToast('Failed to copy results');
+            }
+        }
+
+        // Show a toast message
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Create confetti animation
+        function createConfetti() {
+            confettiContainer.innerHTML = '';
+            const colors = ['#A855F7', '#22D3EE', '#10B981', '#FFD166', '#FF6B6B'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.opacity = '1';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                
+                confettiContainer.appendChild(confetti);
+            }
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall {
+                    0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(100vh) rotate(${Math.random() * 360}deg); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            setTimeout(() => {
+                confettiContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Create fireworks celebration
+        function createFireworks() {
+            celebrationContainer.style.display = 'block';
+            celebrationContainer.innerHTML = '';
+            const colors = ['#A855F7', '#22D3EE', '#10B981', '#FFD166', '#FF6B6B'];
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    
+                    const left = Math.random() * 80 + 10;
+                    const top = Math.random() * 60 + 20;
+                    
+                    firework.style.left = `${left}%`;
+                    firework.style.top = `${top}%`;
+                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    celebrationContainer.appendChild(firework);
+                    
+                    firework.animate([
+                        { transform: 'scale(0)', opacity: 1 },
+                        { transform: 'scale(1)', opacity: 0.8 },
+                        { transform: 'scale(2)', opacity: 0 }
+                    ], {
+                        duration: 1000,
+                        easing: 'ease-out'
+                    });
+                    
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 1000);
+                }, i * 200);
+            }
+            
+            setTimeout(() => {
+                celebrationContainer.style.display = 'none';
+            }, 4000);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
+

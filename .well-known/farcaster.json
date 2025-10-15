@@ -1,0 +1,38 @@
+{
+  "accountAssociation": {
+    "header": "YOUR_SIGNED_HEADER_HERE",
+    "payload": "YOUR_SIGNED_PAYLOAD_HERE", 
+    "signature": "YOUR_SIGNATURE_HERE"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Guess The Token",
+    "iconUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/2488fb7298977dcd1e60af1238d0f57a09aa3e3c/GuessTheToken_logo.png",
+    "homeUrl": "https://guess-the-token.vercel.app",
+    "imageUrl": "https://guess-the-token.vercel.app/og-image.png",
+    "buttonTitle": "🚀 Start Quiz",
+    "splashImageUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/2488fb7298977dcd1e60af1238d0f57a09aa3e3c/GuessTheToken_logo.png",
+    "splashBackgroundColor": "#0E0E10",
+    "description": "Test your knowledge of cryptocurrency tokens and blockchain technology",
+    "subtitle": "Challenge your crypto expertise",
+    "screenshotUrls": [
+      "https://guess-the-token.vercel.app/screenshot1.png",
+      "https://guess-the-token.vercel.app/screenshot2.png"
+    ],
+    "primaryCategory": "education",
+    "tags": ["crypto", "quiz", "education", "blockchain", "tokens"],
+    "heroImageUrl": "https://guess-the-token.vercel.app/og-image.png",
+    "tagline": "How well do you know crypto?",
+    "ogTitle": "Guess The Token",
+    "ogDescription": "Test your knowledge of cryptocurrency tokens and blockchain technology",
+    "ogImageUrl": "https://guess-the-token.vercel.app/og-image.png",
+    "requiredChains": [
+      "eip155:1",
+      "eip155:8453"
+    ],
+    "requiredCapabilities": [
+      "actions.composeCast",
+      "actions.addMiniApp"
+    ]
+  }
+}

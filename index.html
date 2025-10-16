@@ -1,45 +1,12 @@
-<!DOCTYPE html>
+my current index - <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Token Quiz</title>
-    
-    <!-- Farcaster Mini App Meta Tags -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://guess-the-token.vercel.app/og-image.png","button":{"title":"🚀 Start Quiz","action":{"type":"launch_frame","name":"Crypto Token Quiz","url":"https://guess-the-token.vercel.app","splashImageUrl":"https://raw.githubusercontent.com/0xilhan/Guess-the-Token/2488fb7298977dcd1e60af1238d0f57a09aa3e3c/GuessTheToken_logo.png","splashBackgroundColor":"#0E0E10"}}}' />
-    <!-- For backward compatibility -->
-    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://guess-the-token.vercel.app/og-image.png","button":{"title":"🚀 Start Quiz","action":{"type":"launch_frame","name":"Crypto Token Quiz","url":"https://guess-the-token.vercel.app","splashImageUrl":"https://raw.githubusercontent.com/0xilhan/Guess-the-Token/2488fb7298977dcd1e60af1238d0f57a09aa3e3c/GuessTheToken_logo.png","splashBackgroundColor":"#0E0E10"}}}' />
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Crypto Token Quiz" />
-    <meta property="og:description" content="Test your knowledge of cryptocurrency tokens and blockchain technology" />
-    <meta property="og:image" content="https://guess-the-token.vercel.app/og-image.png" />
-    <meta property="og:url" content="https://guess-the-token.vercel.app" />
-    
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    
-    <!-- Farcaster Mini App SDK -->
-    <script type="module">
-        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
-        
-        // Initialize the SDK and hide splash screen when app is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await sdk.actions.ready();
-                console.log('Farcaster Mini App initialized');
-                
-                // Optional: Get user context
-                const context = sdk.context;
-                console.log('User FID:', context.user.fid);
-            } catch (error) {
-                console.error('Failed to initialize Farcaster SDK:', error);
-            }
-        });
-    </script>
-
     <style>
-        /* Your existing CSS remains exactly the same */
         :root {
             --bg: #0E0E10;
             --card: #121216;
@@ -70,7 +37,575 @@
             overflow: hidden;
         }
         
-        /* ... rest of your existing CSS ... */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at top, rgba(168, 85, 247, 0.1), transparent),
+                        radial-gradient(ellipse at bottom, rgba(34, 211, 238, 0.05), transparent),
+                        var(--bg);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent1), var(--accent2));
+            opacity: 0.1;
+            filter: blur(20px);
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 90vh;
+            max-height: 800px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 1s ease, opacity 1s ease;
+        }
+        
+        .app-container.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .neon-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 5;
+        }
+        
+        .neon-success {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.7), 0 0 30px rgba(16, 185, 129, 0.5), 0 0 45px rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+        
+        .neon-wrong {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.7), 0 0 30px rgba(239, 68, 68, 0.5), 0 0 45px rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        .neon-win {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.7), 0 0 30px rgba(168, 85, 247, 0.5), 0 0 45px rgba(168, 85, 247, 0.3), 
+                        0 0 15px rgba(34, 211, 238, 0.7), 0 0 30px rgba(34, 211, 238, 0.5), 0 0 45px rgba(34, 211, 238, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-header .logo {
+            transform: scale(0);
+            animation: logo-pop 0.8s ease 1s forwards;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            animation: shine 3s infinite 1s;
+        }
+        
+        .logo-icon {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .app-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fade-up 0.8s ease 1.2s forwards;
+        }
+        
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(14, 14, 16, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 1s ease 3s; /* Fade out after animation */
+        }
+        
+        .intro-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #intro-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: transparent;
+            border: 2px solid rgba(168, 85, 247, 0.5);
+            box-shadow: none;
+            opacity: 0;
+            animation: boot-sequence 3.5s ease-in-out forwards;
+        }
+        #intro-logo .logo-icon {
+            font-size: 40px;
+            opacity: 0;
+            animation: fade-in-icon 1s ease 1.5s forwards;
+        }
+        
+        .welcome-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(168, 85, 247, 0.3);
+        }
+        
+        .welcome-subtitle {
+            font-size: 16px;
+            margin-bottom: 30px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(168, 85, 247, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .question-counter {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .score-display {
+            font-weight: 600;
+            font-size: 16px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            color: white;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        .option.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10B981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            animation: pulse-correct 0.5s ease;
+        }
+        
+        .option.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            animation: shake 0.5s ease;
+        }
+        
+        .option.disabled {
+            pointer-events: none;
+        }
+        
+        .option-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .result-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .result-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .result-score {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .result-message {
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .app-footer {
+            text-align: center;
+            padding: 15px 0 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--accent1);
+            opacity: 0;
+        }
+        
+        .celebration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+            display: none;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent1);
+            opacity: 0;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pulse-glow {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        @keyframes pulse-correct {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+            50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes logo-pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fade-up {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fade-in-icon {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+
+        @keyframes boot-sequence {
+            0% { opacity: 1; transform: scale(0.8); border-color: rgba(168, 85, 247, 0.2); box-shadow: none; background: transparent; }
+            25% { border-color: rgba(168, 85, 247, 0.8); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+            60% { background: linear-gradient(135deg, var(--accent1), var(--accent2)); box-shadow: 0 8px 30px rgba(168, 85, 247, 0.5); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-height: 700px) {
+            .app-container {
+                height: 95vh;
+                padding: 15px;
+            }
+            
+            .welcome-title {
+                font-size: 28px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -83,7 +618,7 @@
         
         <div class="intro-screen" id="intro-screen">
             <div class="logo" id="intro-logo">
-                <div class="logo-icon">₿</div>
+                 <div class="logo-icon">₿</div>
             </div>
         </div>
         
@@ -133,7 +668,6 @@
                     <div class="action-buttons">
                         <button id="play-again-btn" class="btn btn-primary">Play Again</button>
                         <button id="share-btn" class="btn btn-secondary">Share Score</button>
-                        <button id="add-to-farcaster-btn" class="btn btn-secondary" style="display: none;">Add to Farcaster</button>
                     </div>
                 </div>
             </div>
@@ -213,7 +747,6 @@
         const startBtn = document.getElementById('start-btn');
         const playAgainBtn = document.getElementById('play-again-btn');
         const shareBtn = document.getElementById('share-btn');
-        const addToFarcasterBtn = document.getElementById('add-to-farcaster-btn');
         const currentQuestionEl = document.getElementById('current-question');
         const totalQuestionsEl = document.getElementById('total-questions');
         const currentScoreEl = document.getElementById('current-score');
@@ -254,9 +787,8 @@
             startBtn.addEventListener('click', startGame);
             playAgainBtn.addEventListener('click', startGame);
             shareBtn.addEventListener('click', shareResults);
-            addToFarcasterBtn.addEventListener('click', addToFarcaster);
 
-            initSounds();
+            initSounds(); // Initialize sounds early
             setTimeout(() => playSound('boot_start'), 200);
             setTimeout(() => playSound('boot_charge'), 1000);
             setTimeout(() => playSound('boot_complete'), 2500);
@@ -334,7 +866,6 @@
             neonBorder.style.opacity = '0';
             
             celebrationContainer.style.display = 'none';
-            addToFarcasterBtn.style.display = 'none';
             
             selectedQuestions = [...questions]
                 .sort(() => 0.5 - Math.random())
@@ -455,9 +986,7 @@
             resultTitleEl.textContent = title;
             resultMessageEl.textContent = message;
             
-            // Show "Add to Farcaster" button for good scores
             if (percentage >= 60) {
-                addToFarcasterBtn.style.display = 'block';
                 createConfetti();
                 createFireworks();
                 
@@ -470,47 +999,21 @@
             showScreen(resultsScreen);
         }
 
-        // Add to Farcaster
-        async function addToFarcaster() {
-            playSound('click');
-            try {
-                await sdk.actions.addMiniApp();
-                showToast('Added to your Farcaster apps!');
-                addToFarcasterBtn.style.display = 'none';
-            } catch (error) {
-                if (error.name === 'RejectedByUser') {
-                    showToast('Maybe next time!');
-                } else if (error.name === 'InvalidDomainManifestJson') {
-                    showToast('Please deploy to production domain first');
-                } else {
-                    showToast('Already added to Farcaster!');
-                }
-            }
-        }
-
         // Share results
-        async function shareResults() {
+        function shareResults() {
             playSound('click');
             const shareText = `I scored ${score}/${selectedQuestions.length} on the Crypto Token Quiz! How well do you know crypto?`;
             
-            try {
-                // Try Farcaster native sharing first
-                await sdk.actions.composeCast({
-                    text: shareText,
-                    embeds: [window.location.href]
-                });
-            } catch (error) {
-                // Fallback to regular sharing
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Crypto Token Quiz',
-                        text: shareText
-                    }).catch(err => {
-                        copyToClipboard(shareText);
-                    });
-                } else {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Crypto Token Quiz',
+                    text: shareText
+                }).catch(err => {
+                    console.log('Error sharing:', err);
                     copyToClipboard(shareText);
-                }
+                });
+            } else {
+                copyToClipboard(shareText);
             }
         }
 

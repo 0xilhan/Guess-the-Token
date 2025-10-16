@@ -7,7 +7,7 @@
   "miniapp": {
     "version": "1",
     "name": "Guess The Token",
-    "iconUrl": "https://github.com/0xilhan/Guess-the-Token/blob/8a6f971cb51d4313478661d0ef039403766e3e3d/GuessTheToken_logo.png",
+    "iconUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/d3f19a5ac8967340dc87441ec72eccc3652d8dde/GuessTheToken_logo.png",
     "homeUrl": "https://guess-the-token.vercel.app",
     "imageUrl": "https://raw.githubusercontent.com/0xilhan/GuessTheToken/main/GuessToken_banner.png",
     "buttonTitle": "Challenge Yourself",

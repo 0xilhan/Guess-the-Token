@@ -1,20 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/**/*.js", "use": "@vercel/node" },
-    { "src": "**/*.html", "use": "@vercel/static" }
-  ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ],
-  "headers": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
-        { "key": "Content-Type", "value": "text/html; charset=utf-8" }
-      ]
+      "src": "/.well-known/farcaster.json",
+      "dest": "/farcaster.json",
+      "headers": {
+        "Content-Type": "application/json"
+      }
     }
   ]
 }

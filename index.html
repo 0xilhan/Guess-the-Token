@@ -5,38 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Token Quiz</title>
 
-    <!-- Farcaster Meta Tags - DON'T CHANGE THESE -->
-    <!-- Open Graph Meta Tags -->
-<meta property="og:title" content="Guess The Token" />
+    <meta property="og:title" content="Guess The Token" />
 <meta property="og:description" content="Think you know crypto? Take the quiz and find out!" />
 <meta property="og:image" content="https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png" />
 <meta property="og:url" content="https://guess-the-token.vercel.app/" />
 <meta property="og:type" content="website" />
 
-<!-- Twitter Meta Tags -->
 <meta property="twitter:card" content="summary_large_image" />
   <meta property="twitter:title" content="Crypto Token Quiz" />
   <meta property="twitter:description" content="Can you guess the right crypto token? Try the quiz now!" />
   <meta property="twitter:image" content="https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png" />
 
-<!-- Farcaster Mini App Meta Tags -->
 <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png","button":{"title":"Challenge Yourself","action":{"type":"launch_miniapp","name":"Guess the Token","url":"https://guess-the-token.vercel.app/","splashImageUrl":"https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png","splashBackgroundColor":"#0E0E10"}}}' />
 
 <meta name="fc:frame" content='{"version":"1","imageUrl":"https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png","button":{"title":"Challenge Yourself","action":{"type":"launch_miniapp","name":"Guess the Token","url":"https://guess-the-token.vercel.app/","splashImageUrl":"https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png","splashBackgroundColor":"#0E0E10"}}}' />
-    <!-- Styles and Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
     
+    <script src="https://unpkg.com/@farcaster/miniapp-sdk@0.2.0/dist/index.js"></script>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
 
-  <!-- Audio Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <style>
         :root {
@@ -662,14 +655,12 @@
         </div>
         
         <div class="app-main">
-            <!-- Welcome Screen -->
             <div id="welcome-screen" class="screen hidden">
                 <h1 class="welcome-title floating">CRYPTO QUIZ</h1>
                 <p class="welcome-subtitle">Test your knowledge of cryptocurrency tokens and blockchain technology</p>
                 <button id="start-btn" class="btn btn-primary pulse">Start Quiz</button>
             </div>
             
-            <!-- Quiz Screen -->
             <div id="quiz-screen" class="screen hidden">
                 <div class="question-container">
                     <div class="quiz-header">
@@ -684,12 +675,10 @@
                     <h2 id="question-text" class="question-text">Which project pioneered zk-SNARKs?</h2>
                     
                     <div id="options-container" class="options-container">
-                        <!-- Options will be populated by JavaScript -->
-                    </div>
+                        </div>
                 </div>
             </div>
             
-            <!-- Results Screen -->
             <div id="results-screen" class="screen hidden">
                 <div class="result-container">
                     <div id="result-icon" class="result-icon">🎉</div>
@@ -829,8 +818,8 @@
         function initSounds() {
             if (soundsReady) return;
              if (Tone.context.state !== 'running') {
-                Tone.start();
-            }
+                 Tone.start();
+             }
             sfx = {
                 boot_start: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.2, release: 1 } }).toDestination(),
                 boot_charge: new Tone.AMSynth({ harmonicity: 1.5, detune: 0, oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.5 }, modulation : { type: "square" }, modulationEnvelope: { attack: 0.5, decay: 0.01 } }).toDestination(),
@@ -881,10 +870,18 @@
             }
         }
 
-        // Skip intro and go to welcome screen
-        function skipIntro() {
+        // ✅ 2. MODIFIED THIS FUNCTION
+        // Skip intro, show welcome screen, and signal ready to Farcaster
+        async function skipIntro() { // Made the function async
             introScreen.classList.add('hidden');
             welcomeScreen.classList.remove('hidden');
+
+            // Tell Farcaster the app has loaded
+            try {
+                await window.farcaster.sdk.actions.ready();
+            } catch (error) {
+                console.error("Farcaster SDK failed to signal ready:", error);
+            }
         }
 
         // Start a new game
@@ -1063,10 +1060,10 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 showToast('Results copied to clipboard!');
-            } catch (err) {
+             } catch (err) {
                 console.error('Failed to copy: ', err);
                 showToast('Failed to copy results');
-            }
+             }
         }
 
         // Show a toast message

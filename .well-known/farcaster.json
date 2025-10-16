@@ -1,10 +1,10 @@
 {
   "accountAssociation": {
-    "header": "Farcaster Verify",
-    "payload": "Guess the Token Mini App Verification",
-    "signature": "0xYOUR_SIGNATURE_HERE"
+    "header": "eyJmaWQiOjQ3NTQ3OSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDdiYmNGRjljOGQzMWRENEU2YTRhRTEwQzkwZjYwMGQzNGEyQTJBQTQifQ",
+    "payload": "eyJkb21haW4iOiJ3b3Jkb2Z0aGVkYXl2Mi52ZXJjZWwuYXBwIn0",
+    "signature": "MHgzZTIxYTcwMmYxMzZjMGFlOWJlNGFjMzFjNTJjNTg5MjhmNDdkN2UxYWFiOTA4MzY1MTE1M2U0YzA5YTg1YjcwNGE5ZGNkODRhYmFiN2I3MDQxOTE2ZWFmNGExMWM4ZmI0MjBjOGQ0Y2E3ZWIwMzliYmMwZTdiMjhiNjVmOGViZDFi"
   },
-  "frame": {
+  "miniapp": {
     "version": "1",
     "name": "Guess The Token",
     "iconUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/d3f19a5ac8967340dc87441ec72eccc3652d8dde/GuessTheToken_logo.png",

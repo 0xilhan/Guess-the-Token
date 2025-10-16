@@ -26,8 +26,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     
-    <script src="https://unpkg.com/@farcaster/miniapp-sdk@0.2.0/dist/index.js"></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
@@ -705,6 +703,24 @@
     <div id="toast" class="toast">Copied to clipboard</div>
     
     <script>
+        // ============================================
+        // FARCASTER SDK SETUP - SIMPLE VERSION
+        // ============================================
+        
+        // Simple Farcaster setup - just makes app work in Farcaster
+        async function setupFarcaster() {
+            try {
+                // Try to load Farcaster SDK
+                const { sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                // Tell Farcaster our app is ready to show
+                await sdk.actions.ready();
+                console.log('✅ App is running in Farcaster!');
+            } catch (error) {
+                // If not in Farcaster, that's OK - app still works normally
+                console.log('🌐 Running as regular web app');
+            }
+        }
+
         // Question bank
         const questions = [
             {
@@ -870,18 +886,12 @@
             }
         }
 
-        // ✅ 2. MODIFIED THIS FUNCTION
-        // Skip intro, show welcome screen, and signal ready to Farcaster
-        async function skipIntro() { // Made the function async
+        // Skip intro and go to welcome screen
+        function skipIntro() {
             introScreen.classList.add('hidden');
             welcomeScreen.classList.remove('hidden');
-
-            // Tell Farcaster the app has loaded
-            try {
-                await window.farcaster.sdk.actions.ready();
-            } catch (error) {
-                console.error("Farcaster SDK failed to signal ready:", error);
-            }
+            // ✅ Call the Farcaster setup function here
+            setupFarcaster();
         }
 
         // Start a new game

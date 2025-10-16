@@ -1,18 +1,18 @@
 {
   "accountAssociation": {
-    "header": "<YOUR_HEADER_HERE>",
-    "payload": "<YOUR_PAYLOAD_HERE>",
-    "signature": "<YOUR_SIGNATURE_HERE>"
+    "header": "Farcaster Verify",
+    "payload": "Guess the Token Mini App Verification",
+    "signature": "0xYOUR_SIGNATURE_HERE"
   },
-  "miniapp": {
+  "frame": {
     "version": "1",
     "name": "Guess The Token",
     "iconUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/d3f19a5ac8967340dc87441ec72eccc3652d8dde/GuessTheToken_logo.png",
     "homeUrl": "https://guess-the-token.vercel.app",
     "imageUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png",
     "buttonTitle": "Challenge Yourself",
-    "splashImageUrl": "https://github.com/0xilhan/Guess-the-Token/blob/8a6f971cb51d4313478661d0ef039403766e3e3d/Og_image.png",
-    "splashBackgroundColor": "#121212",
-    "description": "A fun crypto quiz where you guess the token from its hints!"
+    "splashImageUrl": "https://raw.githubusercontent.com/0xilhan/Guess-the-Token/7779123a12d7537ab7b27c6ade81525709f9d746/Og_image.png",
+    "splashBackgroundColor": "#0E0E10",
+    "description": "Test your crypto knowledge with this interactive quiz!"
   }
 }

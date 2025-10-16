@@ -714,6 +714,30 @@
     </div>
     
     <div id="toast" class="toast">Copied to clipboard</div>
+
+     <!-- JavaScript -->
+    <script>
+        // ============================================
+        // FARCASTER SDK SETUP - SIMPLE VERSION
+        // ============================================
+        
+        // Simple Farcaster setup - just makes app work in Farcaster
+        async function setupFarcaster() {
+            try {
+                // Try to load Farcaster SDK
+                const { sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                // Tell Farcaster our app is ready to show
+                await sdk.actions.ready();
+                console.log('✅ App is running in Farcaster!');
+            } catch (error) {
+                // If not in Farcaster, that's OK - app still works normally
+                console.log('🌐 Running as regular web app');
+            }
+        }
+
+        // ============================================
+        // CRYPTO WORDS DATA
+        // ============================================
     
     <script>
         // Question bank

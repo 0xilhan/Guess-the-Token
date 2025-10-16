@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "<YOUR_HEADER_HERE>",
+    "payload": "<YOUR_PAYLOAD_HERE>",
+    "signature": "<YOUR_SIGNATURE_HERE>"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Guess The Token",
+    "iconUrl": "https://github.com/0xilhan/Guess-the-Token/blob/8a6f971cb51d4313478661d0ef039403766e3e3d/GuessTheToken_logo.png",
+    "homeUrl": "https://guess-the-token.vercel.app",
+    "imageUrl": "https://raw.githubusercontent.com/0xilhan/GuessTheToken/main/GuessToken_banner.png",
+    "buttonTitle": "Challenge Yourself",
+    "splashImageUrl": "https://github.com/0xilhan/Guess-the-Token/blob/8a6f971cb51d4313478661d0ef039403766e3e3d/Og_image.png",
+    "splashBackgroundColor": "#121212",
+    "description": "A fun crypto quiz where you guess the token from its hints!"
+  }
+}
